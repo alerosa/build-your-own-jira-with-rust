@@ -139,7 +139,10 @@ pub mod cli {
                     description,
                     status,
                 }) {
-                    Some(_) => println!("The following ticket has been updated"),
+                    Some(updated_ticket) => println!(
+                        "The following ticket has been updated:\n{:?}",
+                        updated_ticket
+                    ),
                     None => println!("There was no ticket to update")
                 }
             }
