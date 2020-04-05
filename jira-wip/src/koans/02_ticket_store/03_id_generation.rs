@@ -20,13 +20,14 @@ mod id_generation {
     // Feel free to add more fields to `TicketStore` to solve this koan!
     struct TicketStore {
         data: HashMap<TicketId, Ticket>,
+        last_id: u32,
     }
 
     impl TicketStore {
-        pub fn new() -> TicketStore
-        {
+        pub fn new() -> TicketStore {
             TicketStore {
                 data: HashMap::new(),
+                last_id: 0,
             }
         }
 
@@ -45,8 +46,7 @@ mod id_generation {
         /// We want the same behaviour in our clone, IronJira.
         /// `TicketStore` will take care of generating an id for our ticket and the id
         /// will be returned by `save` after insertion.
-        pub fn save(&mut self, ticket: Ticket) -> TicketId
-        {
+        pub fn save(&mut self, ticket: Ticket) -> TicketId {
             let id = self.generate_id();
             self.data.insert(id, ticket);
             id
@@ -56,8 +56,9 @@ mod id_generation {
             self.data.get(id)
         }
 
-        fn generate_id(__) -> TicketId {
-           todo!()
+        fn generate_id(&mut self) -> TicketId {
+            self.last_id = self.last_id + 1;
+            self.last_id
         }
     }
 

@@ -59,14 +59,38 @@ mod delete_and_update {
         /// If the `id` passed in matches a ticket in the store, we return the edited ticket.
         /// If it doesn't, we return `None`.
         pub fn update(&mut self, id: &TicketId, patch: TicketPatch) -> Option<&Ticket> {
-            todo!()
+            match self.data.get(id) {
+                None => None,
+                Some(ticket) => {
+                    let edited_ticket = Ticket {
+                        id: *id,
+                        title: patch.title.unwrap_or(ticket.title.clone()),
+                        description: patch.description.unwrap_or(ticket.description.clone()),
+                        status: patch.status.unwrap_or(ticket.status.clone()),
+                        created_at: ticket.created_at,
+                        updated_at: Utc::now(),
+                    };
+
+                    self.data.insert(*id, edited_ticket);
+
+                    self.data.get(id)
+                },
+            }
         }
 
         /// If the `id` passed in matches a ticket in the store, we return the deleted ticket
         /// with some additional metadata.
         /// If it doesn't, we return `None`.
         pub fn delete(&mut self, id: &TicketId) -> Option<DeletedTicket> {
-            todo!()
+            match self.data.remove(id) {
+                None => None,
+                Some(deleted_ticket) => {
+                    Some(DeletedTicket {
+                        ticket: deleted_ticket,
+                        deleted_at: Utc::now(),
+                    })
+                }
+            }
         }
 
         fn generate_id(&mut self) -> TicketId {

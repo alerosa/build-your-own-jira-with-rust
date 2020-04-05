@@ -36,12 +36,17 @@ mod type_as_constraints {
 
     #[derive(Debug, Clone, PartialEq)]
     pub struct TicketDraft {
-        __
+        title: String,
+        description: String,
     }
 
     #[derive(Debug, Clone, PartialEq)]
     pub struct Ticket {
-        __
+        id: TicketId,
+        title: String,
+        description: String,
+        status: Status,
+        created_at: DateTime<Utc>,
     }
 
     struct TicketStore {
@@ -50,8 +55,7 @@ mod type_as_constraints {
     }
 
     impl TicketStore {
-        pub fn new() -> TicketStore
-        {
+        pub fn new() -> TicketStore {
             TicketStore {
                 data: HashMap::new(),
                 current_id: 0,
@@ -70,7 +74,11 @@ mod type_as_constraints {
             // This enforces our desired invariant: saving a draft in the store
             // is the only way to "create" a `Ticket`.
             let ticket = Ticket {
-
+                description: draft.description,
+                status: Status::ToDo,
+                title: draft.title,
+                id,
+                created_at: Utc::now(),
             };
             self.data.insert(id, ticket);
             id
@@ -87,16 +95,30 @@ mod type_as_constraints {
     }
 
     impl TicketDraft {
-        pub fn title(&self) -> &String { todo!() }
-        pub fn description(&self) -> &String { todo!() }
+        pub fn title(&self) -> &String {
+            &self.title
+        }
+        pub fn description(&self) -> &String {
+            &self.description
+        }
     }
 
     impl Ticket {
-        pub fn title(&self) -> &String { todo!() }
-        pub fn description(&self) -> &String { todo!() }
-        pub fn status(&self) -> &Status { todo!() }
-        pub fn created_at(&self) -> &DateTime<Utc> { todo!() }
-        pub fn id(&self) -> &TicketId { todo!() }
+        pub fn title(&self) -> &String {
+            &self.title
+        }
+        pub fn description(&self) -> &String {
+            &self.description
+        }
+        pub fn status(&self) -> &Status {
+            &self.status
+        }
+        pub fn created_at(&self) -> &DateTime<Utc> {
+            &self.created_at
+        }
+        pub fn id(&self) -> &TicketId {
+            &self.id
+        }
     }
 
     pub fn create_ticket_draft(title: String, description: String) -> TicketDraft {

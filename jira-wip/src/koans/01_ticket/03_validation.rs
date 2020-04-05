@@ -25,7 +25,19 @@ mod validation {
     /// We will learn a better way to handle recoverable errors such as this one further along,
     /// but let's rely on panic for the time being.
     fn create_ticket(title: String, description: String, status: Status) -> Ticket {
-       todo!()
+       if title.len() < 1 || title.len() > 51 {
+           panic!()
+       }
+
+       if description.len() < 1 || description.len() > 3000 {
+           panic!()
+       }
+
+       Ticket {
+           title,
+           description,
+           status
+       }
     }
 
     #[cfg(test)]

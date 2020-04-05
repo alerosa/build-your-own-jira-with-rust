@@ -35,7 +35,10 @@ pub mod cli {
     pub enum Command {
         /// Create a ticket on your board.
         Create {
-            __
+            #[structopt(long)]
+            description: TicketDescription,
+            #[structopt(long)]
+            title: TicketTitle,
         },
         /// Edit the details of an existing ticket.
         Edit {
@@ -54,7 +57,8 @@ pub mod cli {
         },
         /// Delete a ticket from the store passing the ticket id.
         Delete {
-            __
+            #[structopt(long)]
+            id: TicketId,
         },
         /// List all existing tickets.
         List,
@@ -69,16 +73,30 @@ pub mod cli {
         type Err = ParsingError;
 
         fn from_str(s: &str) -> Result<Self, Self::Err> {
-            __
+            match s {
+                "ToDo" => Ok(Status::ToDo),
+                "InProgress" => Ok(Status::InProgress),
+                "Blocked" => Ok(Status::Blocked),
+                "Done" => Ok(Status::Done),
+                _ => Err(ParsingError("Invalid Status".to_string())),
+            }
         }
     }
 
     impl FromStr for TicketTitle {
-        __
+        type Err = ParsingError;
+
+        fn from_str(s: &str) -> Result<Self, Self::Err> {
+            TicketTitle::new(s.to_string()).map_err(|e| ParsingError(e.to_string()))
+        }
     }
 
     impl FromStr for TicketDescription {
-        __
+        type Err = ParsingError;
+
+        fn from_str(s: &str) -> Result<Self, Self::Err> {
+            TicketDescription::new(s.to_string()).map_err(|e| ParsingError(e.to_string()))
+        }
     }
 
     /// Our error struct for parsing failures.
@@ -105,7 +123,10 @@ pub mod cli {
     pub fn handle_command(ticket_store: &mut TicketStore, command: Command) -> Result<(), Box<dyn Error>> {
         match command {
             Command::Create { description, title } => {
-                todo!()
+                ticket_store.save(TicketDraft {
+                    title,
+                    description,
+                });
             }
             Command::Edit {
                 id,
@@ -113,20 +134,27 @@ pub mod cli {
                 description,
                 status,
             } => {
-                todo!()
+                match ticket_store.update(&id, TicketPatch {
+                    title,
+                    description,
+                    status,
+                }) {
+                    Some(_) => println!("The following ticket has been updated"),
+                    None => println!("There was no ticket to update")
+                }
             }
-            Command::Delete { ticket_id } => match ticket_store.delete(&ticket_id) {
+            Command::Delete { id } => match ticket_store.delete(&id) {
                 Some(deleted_ticket) => println!(
                     "The following ticket has been deleted:\n{:?}",
                     deleted_ticket
                 ),
                 None => println!(
                     "There was no ticket associated to the ticket id {:?}",
-                    ticket_id
+                    id
                 ),
             },
             Command::List => {
-                todo!()
+                ticket_store.list();
             }
         }
         Ok(())
